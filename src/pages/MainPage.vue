@@ -58,19 +58,19 @@ const faultLines = [
   {
     id: 1,
     fName: 'KHLONG MARUI',
-    coordinates: { longitude: 98.5817, latitude: 8.668 },
+    coordinates: { longitude: 98.6462, latitude: 8.5078 },
     zoom: 8,
   },
   {
     id: 2,
     fName: 'MAE CHAN',
-    coordinates: { longitude: 99.8605, latitude: 20.1283 },
+    coordinates: { longitude: 99.7994, latitude: 20.1583 },
     zoom: 11,
   },
   {
     id: 3,
     fName: 'MAE HONG SON',
-    coordinates: { longitude: 97.9054, latitude: 18.3842 },
+    coordinates: { longitude: 97.9933, latitude: 18.3699 },
     zoom: 9,
   },
   {
@@ -82,7 +82,7 @@ const faultLines = [
   {
     id: 5,
     fName: 'MOEI',
-    coordinates: { longitude: 98.5975, latitude: 17.0936 },
+    coordinates: { longitude: 98.5865, latitude: 16.961 },
     zoom: 9,
   },
   {
@@ -94,19 +94,19 @@ const faultLines = [
   {
     id: 7,
     fName: 'THOEN',
-    coordinates: { longitude: 99.9125, latitude: 18.2172 },
+    coordinates: { longitude: 99.6708, latitude: 17.9496 },
     zoom: 9,
   },
   {
     id: 8,
     fName: 'PHETCHABUN',
-    coordinates: { longitude: 101.2197, latitude: 16.5139 },
+    coordinates: { longitude: 101.162, latitude: 16.3967 },
     zoom: 9,
   },
   {
     id: 9,
     fName: 'PUA',
-    coordinates: { longitude: 100.8926, latitude: 19.222 },
+    coordinates: { longitude: 100.9118, latitude: 19.102 },
     zoom: 10,
   },
   {
@@ -118,7 +118,7 @@ const faultLines = [
   {
     id: 11,
     fName: 'RANONG',
-    coordinates: { longitude: 98.8036, latitude: 10.261 },
+    coordinates: { longitude: 98.7926, latitude: 10.0907 },
     zoom: 8,
   },
   {
@@ -130,25 +130,25 @@ const faultLines = [
   {
     id: 13,
     fName: 'THREE PAGODA',
-    coordinates: { longitude: 98.765, latitude: 14.5288 },
+    coordinates: { longitude: 98.8309, latitude: 14.6418 },
     zoom: 9,
   },
   {
     id: 14,
     fName: 'UTTARADIT',
-    coordinates: { longitude: 100.6312, latitude: 17.7281 },
+    coordinates: { longitude: 100.579, latitude: 17.7144 },
     zoom: 10,
   },
   {
     id: 15,
     fName: 'WIANG HAENG',
-    coordinates: { longitude: 98.7149, latitude: 19.3645 },
+    coordinates: { longitude: 98.671, latitude: 19.3502 },
     zoom: 9,
   },
   {
     id: 16,
     fName: 'MAE LAO',
-    coordinates: { longitude: 99.6268, latitude: 19.7392 },
+    coordinates: { longitude: 99.8094, latitude: 19.8639 },
     zoom: 10,
   },
 ];
@@ -250,7 +250,31 @@ const selectFaultLine = async () => {
       },
     });
 
+    const textSymbol = {
+      type: 'text',
+      color: [0, 0, 0], // Black
+      haloColor: [255, 255, 255], // White
+      haloSize: 1,
+      text: selectedFault.fName,
+      xoffset: 0,
+      yoffset: 10, // Offset the label slightly above the point
+      font: {
+        size: 12,
+        weight: 'bold',
+      },
+    };
+
+    const labelGraphic = new Graphic({
+      geometry: {
+        type: 'point',
+        longitude: selectedFault.coordinates.longitude,
+        latitude: selectedFault.coordinates.latitude,
+      },
+      symbol: textSymbol,
+    });
+
     map.findLayerById('pointLayer').add(pointGraphic);
+    map.findLayerById('pointLayer').add(labelGraphic);
 
     mapView.zoom = selectedFault.zoom;
 
