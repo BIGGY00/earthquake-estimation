@@ -183,6 +183,9 @@ onMounted(async () => {
   const polygonLayer = new GraphicsLayer({ id: 'polygonLayer' });
   map.add(polygonLayer);
 
+  const pointLayer = new GraphicsLayer({ id: 'pointLayer' });
+  map.add(pointLayer);
+
   const ThaifaultLines = new FeatureLayer({
     url: 'https://gisportal.dmr.go.th/arcgis/rest/services/HAZARD/ZONE_ACTIVEFAULT/MapServer',
   });
@@ -191,11 +194,11 @@ onMounted(async () => {
     url: 'https://services9.arcgis.com/CGSTChWyOjfHFaYa/arcgis/rest/services/Fault_Map__Everyone__WFL1/FeatureServer/3',
   });
 
-  const FaultLines = new FeatureLayer({
-    url: 'https://services.arcgis.com/jIL9msH9OI208GCb/arcgis/rest/services/Active_Faults/FeatureServer',
-  });
+  // const FaultLines = new FeatureLayer({
+  //   url: 'https://services.arcgis.com/jIL9msH9OI208GCb/arcgis/rest/services/Active_Faults/FeatureServer',
+  // });
 
-  map.addMany([ThaifaultLines, bordeLines, FaultLines]);
+  map.addMany([ThaifaultLines, bordeLines]);
 
   const navigationDiv = document.querySelector('.esri-ui-top-left');
   if (navigationDiv) {
@@ -224,11 +227,30 @@ const selectFaultLine = async () => {
 
   if (selectedFault && selectedFault.fName !== 'NOT SELECTED') {
     map.findLayerById('polygonLayer').removeAll();
+    map.findLayerById('pointLayer').removeAll();
 
     mapView.center = [
       selectedFault.coordinates.longitude,
       selectedFault.coordinates.latitude,
     ];
+
+    const pointGraphic = new Graphic({
+      geometry: {
+        type: 'point',
+        longitude: selectedFault.coordinates.longitude,
+        latitude: selectedFault.coordinates.latitude,
+      },
+      symbol: {
+        type: 'simple-marker',
+        color: [226, 119, 40], // Orange
+        outline: {
+          color: [255, 255, 255], // White
+          width: 1,
+        },
+      },
+    });
+
+    map.findLayerById('pointLayer').add(pointGraphic);
 
     mapView.zoom = selectedFault.zoom;
 
@@ -257,6 +279,7 @@ const selectFaultLine = async () => {
     }
   } else {
     map.findLayerById('polygonLayer').removeAll();
+    map.findLayerById('pointLayer').removeAll();
 
     mapView.center = [100.9925, 13.7563];
     mapView.zoom = 6;
