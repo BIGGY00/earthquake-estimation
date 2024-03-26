@@ -200,7 +200,7 @@ onMounted(async () => {
   const navigationDiv = document.querySelector('.esri-ui-top-left');
   if (navigationDiv) {
     navigationDiv.classList.remove('esri-ui-top-left');
-    navigationDiv.classList.add('esri-ui-bottom-right');
+    navigationDiv.classList.add('esri-ui-top-right');
   }
 
   mapView.container.addEventListener('mousemove', (event) => {
