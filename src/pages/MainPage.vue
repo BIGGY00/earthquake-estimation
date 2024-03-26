@@ -39,11 +39,83 @@ const selectedFaultLine = ref(null);
 const faultLines = [
   {
     fName: 'KHLONG MARUI',
-    coordinates: { longitude: 100.0, latitude: 20.1 },
-    zoom: 8,
+    coordinates: { longitude: 98.5817, latitude: 8.668 },
+    zoom: 10,
   },
   {
     fName: 'MAE CHAN',
+    coordinates: { longitude: 99.8605, latitude: 20.1283 },
+    zoom: 12,
+  },
+  {
+    fName: 'MAE HONG SON',
+    coordinates: { longitude: 97.9054, latitude: 18.3842 },
+    zoom: 10,
+  },
+  {
+    fName: 'MAE ING',
+    coordinates: { longitude: 100.4294, latitude: 19.9856 },
+    zoom: 11,
+  },
+  {
+    fName: 'MOEI',
+    coordinates: { longitude: 98.5975, latitude: 17.0936 },
+    zoom: 10,
+  },
+  {
+    fName: 'MAE THA',
+    coordinates: { longitude: 99.0587, latitude: 18.8892 },
+    zoom: 10,
+  },
+  {
+    fName: 'THOEN',
+    coordinates: { longitude: 99.9125, latitude: 18.2172 },
+    zoom: 10,
+  },
+  {
+    fName: 'PHETCHABUN',
+    coordinates: { longitude: 101.2197, latitude: 16.5139 },
+    zoom: 10,
+  },
+  {
+    fName: 'PUA',
+    coordinates: { longitude: 100.8926, latitude: 19.222 },
+    zoom: 11,
+  },
+  {
+    fName: 'PHA YAO',
+    coordinates: { longitude: 99.6481, latitude: 19.0255 },
+    zoom: 10,
+  },
+  {
+    fName: 'RANONG',
+    coordinates: { longitude: 98.8036, latitude: 10.261 },
+    zoom: 9,
+  },
+  {
+    fName: 'SI SAWAT',
+    coordinates: { longitude: 98.9748, latitude: 15.2919 },
+    zoom: 10,
+  },
+  {
+    fName: 'THREE PAGODA',
+    coordinates: { longitude: 98.765, latitude: 14.5288 },
+    zoom: 10,
+  },
+  {
+    fName: 'UTTARADIT',
+    coordinates: { longitude: 100.6312, latitude: 17.7281 },
+    zoom: 11,
+  },
+  {
+    fName: 'WIANG HAENG',
+    coordinates: { longitude: 98.7149, latitude: 19.3645 },
+    zoom: 10,
+  },
+  {
+    fName: 'MAE LAO',
+    coordinates: { longitude: 99.6268, latitude: 19.7392 },
+    zoom: 11,
   },
 ];
 
