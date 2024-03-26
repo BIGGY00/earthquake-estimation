@@ -25,7 +25,7 @@
       </select>
     </div>
     <div
-      class="absolute bottom-7 right-20 z-10 text-white bg-black p-1 rounded-md"
+      class="absolute bottom-7 right-4 z-10 text-white bg-black p-1 rounded-md"
     >
       <p>
         {{
