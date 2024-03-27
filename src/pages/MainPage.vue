@@ -8,7 +8,7 @@
       </div>
       <select
         class="rounded-lg h-auto w-auto p-2 border border-2 cursor-pointer"
-        v-model="selectedFaultLine"
+        v-model="selectedFaultLine.fName"
         @change="selectFaultLine"
         placeholder="Select Fault Lines"
       >
@@ -24,6 +24,15 @@
         </option>
       </select>
     </div>
+    <div class="relative z-1 pl-5">
+      <button
+        v-if="selectedFaultLine.id !== 0"
+        @click="toggleDialog"
+        class="h-auto w-auto bg-white p-2 rounded-lg hover:bg-black text-black hover:text-white transition-colors duration-300"
+      >
+        {{ isDialogOpen ? 'Close Dialog' : 'Open Dialog' }}
+      </button>
+    </div>
     <div
       class="absolute bottom-7 right-4 z-10 text-white bg-black p-1 rounded-md"
     >
@@ -37,17 +46,32 @@
       </p>
     </div>
   </div>
+
+  <!-- <q-dialog v-model="isDialogOpen">
+    <dialogDetail :selectedFault="selectedFaultLine" />
+  </q-dialog> -->
+
+  <div class="flex justify-center items-center h-screen">
+    <q-dialog
+      v-model="isDialogOpen"
+      class="w-full sm:w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4"
+    >
+      <dialogDetail :selectedFault="selectedFaultLine" />
+    </q-dialog>
+  </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue';
 import { loadModules } from 'esri-loader';
 import polygonData from 'src/utils/polygon-normal.json';
+import dialogDetail from 'src/components/DialogDetail.vue';
 
 let map = null;
 let mapView = null;
 const selectedCoordinates = ref({ longitude: 0, latitude: 0 });
-const selectedFaultLine = ref('NOT SELECTED');
+const selectedFaultLine = ref({ id: 0, fName: 'NOT SELECTED' });
+const isDialogOpen = ref(false);
 const faultLines = [
   {
     id: 0,
@@ -203,7 +227,7 @@ onMounted(async () => {
   const navigationDiv = document.querySelector('.esri-ui-top-left');
   if (navigationDiv) {
     navigationDiv.classList.remove('esri-ui-top-left');
-    navigationDiv.classList.add('esri-ui-top-right');
+    navigationDiv.classList.add('esri-ui-bottom-left');
   }
 
   mapView.container.addEventListener('mousemove', (event) => {
@@ -222,10 +246,17 @@ onMounted(async () => {
 const selectFaultLine = async () => {
   const [Graphic] = await loadModules(['esri/Graphic']);
   const selectedFault = faultLines.find(
-    (faultLine) => faultLine.fName === selectedFaultLine.value
+    (faultLine) => faultLine.fName === selectedFaultLine.value.fName
   );
 
+  selectedFaultLine.value.id = selectedFault.id;
+  selectedFaultLine.value.fName = selectedFault.fName;
+
+  // console.log(selectedFaultLine.value);
+
   if (selectedFault && selectedFault.fName !== 'NOT SELECTED') {
+    selectedFaultLine.value.id = selectedFault.id;
+    selectedFaultLine.value.fName = selectedFault.fName;
     map.findLayerById('polygonLayer').removeAll();
     map.findLayerById('pointLayer').removeAll();
 
@@ -301,12 +332,20 @@ const selectFaultLine = async () => {
       });
       map.findLayerById('polygonLayer').add(polygonGraphic);
     }
+
+    isDialogOpen.value = true;
   } else {
     map.findLayerById('polygonLayer').removeAll();
     map.findLayerById('pointLayer').removeAll();
 
     mapView.center = [100.9925, 13.7563];
     mapView.zoom = 6;
+
+    isDialogOpen.value = false;
   }
+};
+
+const toggleDialog = () => {
+  isDialogOpen.value = !isDialogOpen.value;
 };
 </script>
