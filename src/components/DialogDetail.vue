@@ -50,6 +50,9 @@
 <script setup>
 import { defineProps, ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useQuasar } from 'quasar';
+
+const q = useQuasar();
 
 const props = defineProps({
   selectedFault: {
@@ -61,30 +64,71 @@ const props = defineProps({
 const timeSeriesImageSrc = ref('');
 const nfftImageSrc = ref('');
 
-// Fetch images when the component is mounted
-onMounted(() => {
-  fetchImages();
+const preloadedImages = {
+  timeSeries: `time/${props.selectedFault.id}.png`,
+  nfft: `nfft/${props.selectedFault.id}.png`,
+};
+
+onMounted(async () => {
+  try {
+    q.loading.show({
+      delay: 3000, // ms
+    });
+    timeSeriesImageSrc.value = preloadedImages.timeSeries;
+    nfftImageSrc.value = preloadedImages.nfft;
+  } catch (error) {
+    console.error('Error fetching: ', error);
+  } finally {
+    q.loading.hide();
+  }
+
+  checkForUpdates();
 });
 
-const fetchImages = async () => {
+const checkForUpdates = async () => {
   try {
-    // Fetch time series image
-    const timeSeriesResponse = await axios.get(
-      `https://earthquake-flask.onrender.com/generate_plot_time?id=${props.selectedFault.id}`,
-      { responseType: 'blob' }
+    const timeSeriesMetaResponse = await axios.head(
+      `https://earthquake-flask.onrender.com/generate_plot_time?id=${props.selectedFault.id}`
     );
-    const imageUrlTime = URL.createObjectURL(timeSeriesResponse.data);
-    timeSeriesImageSrc.value = await imageUrlTime;
+    const timeSeriesLastModified =
+      timeSeriesMetaResponse.headers['last-modified'];
 
-    // Fetch NFFT spectrum image
-    const nfftResponse = await axios.get(
-      `https://earthquake-flask.onrender.com/generate_plot_nfft?id=${props.selectedFault.id}`,
+    const nfftMetaResponse = await axios.head(
+      `https://earthquake-flask.onrender.com/generate_plot_nfft?id=${props.selectedFault.id}`
+    );
+    const nfftLastModified = nfftMetaResponse.headers['last-modified'];
+
+    if (timeSeriesLastModified !== preloadedImages.timeSeriesLastModified) {
+      await fetchAndUpdateImage('timeSeries');
+    }
+
+    if (nfftLastModified !== preloadedImages.nfftLastModified) {
+      await fetchAndUpdateImage('nfft');
+    }
+  } catch (error) {
+    console.error('Error checking for updates:', error);
+  }
+};
+
+const fetchAndUpdateImage = async (imageType) => {
+  try {
+    // Fetch updated image
+    const response = await axios.get(
+      `https://earthquake-flask.onrender.com/generate_plot_${imageType}?id=${props.selectedFault.id}`,
       { responseType: 'blob' }
     );
-    const imageUrlNfft = URL.createObjectURL(nfftResponse.data);
-    nfftImageSrc.value = await imageUrlNfft;
+
+    preloadedImages[`${imageType}LastModified`] =
+      response.headers['last-modified'];
+    preloadedImages[imageType] = URL.createObjectURL(response.data);
+
+    if (imageType === 'timeSeries') {
+      timeSeriesImageSrc.value = preloadedImages.timeSeries;
+    } else if (imageType === 'nfft') {
+      nfftImageSrc.value = preloadedImages.nfft;
+    }
   } catch (error) {
-    console.error('Error fetching images:', error);
+    console.error(`Error fetching or updating ${imageType} image:`, error);
   }
 };
 </script>
