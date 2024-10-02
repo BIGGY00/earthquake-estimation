@@ -8,7 +8,9 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-2">
+      <!-- Flex direction switches based on screen size and grid for larger screens -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Time-series data image 1 -->
         <div class="border border-[2px] border-black rounded-md">
           <div class="ml-5 flex flex-row gap-2 mt-2">
             - Time-series data of
@@ -21,28 +23,61 @@
             v-if="timeSeriesImageSrc"
             :src="timeSeriesImageSrc"
             alt="Time Series Image"
-            class="w-auto h-auto"
+            class="w-full h-auto"
           />
         </div>
 
+        <!-- laplace 3D spectrum -->
         <div class="border border-[2px] border-black rounded-md">
           <div class="ml-5 flex flex-row gap-2 mt-2">
-            - NFFT spectrum for
+            - Laplace 3D spectrum for
             <div class="text-bold text-green">
               {{ props.selectedFault.fName }}
             </div>
             fault line.
           </div>
           <img
+            v-if="ltImageSrc"
+            :src="ltImageSrc"
+            alt="laplace Spectrum Image"
+            class="w-full h-auto"
+          />
+        </div>
+
+        <!-- NFFT Spectrum Image image -->
+        <div class="border border-[2px] border-black rounded-md">
+          <div class="ml-5 flex flex-row gap-2 mt-2">
+            - NFFT spectrum for
+            <div class="text-bold text-green">
+              {{ props.selectedFault.fName }}
+            </div>
+            seismic event.
+          </div>
+          <img
             v-if="nfftImageSrc"
             :src="nfftImageSrc"
             alt="NFFT Spectrum Image"
-            class="w-auto h-auto"
+            class="w-full h-auto"
+          />
+        </div>
+
+        <!-- lsp spectrum image -->
+        <div class="border border-[2px] border-black rounded-md">
+          <div class="ml-5 flex flex-row gap-2 mt-2">
+            - Lomp-Scargle Periodograms spectrum for
+            <div class="text-bold text-green">
+              {{ props.selectedFault.fName }}
+            </div>
+            fault line.
+          </div>
+          <img
+            v-if="lsImageSrc"
+            :src="lsImageSrc"
+            alt="LSP Spectrum Image"
+            class="w-full h-auto"
           />
         </div>
       </div>
-
-      <p></p>
     </q-card>
   </div>
 </template>
@@ -63,10 +98,14 @@ const props = defineProps({
 
 const timeSeriesImageSrc = ref('');
 const nfftImageSrc = ref('');
+const ltImageSrc = ref('');
+const lsImageSrc = ref('');
 
 const preloadedImages = {
   timeSeries: `time/${props.selectedFault.id}.png`,
   nfft: `nfft/${props.selectedFault.id}.png`,
+  lt: `lt/${props.selectedFault.id}.png`,
+  ls: `ls/${props.selectedFault.id}.png`,
 };
 
 onMounted(async () => {
@@ -76,6 +115,8 @@ onMounted(async () => {
     });
     timeSeriesImageSrc.value = preloadedImages.timeSeries;
     nfftImageSrc.value = preloadedImages.nfft;
+    ltImageSrc.value = preloadedImages.lt;
+    lsImageSrc.value = preloadedImages.ls;
   } catch (error) {
     console.error('Error fetching: ', error);
   } finally {
