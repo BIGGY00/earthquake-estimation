@@ -25,6 +25,15 @@
             alt="Time Series Image"
             class="w-full h-auto"
           />
+          <div class="mt-2">
+            <div class="ml-5 flex flex-row gap-2">
+              - This fault line has range in
+              <div class="text-bold text-green">
+                {{ selectedData?.range || 'N/A' }}
+              </div>
+              days
+            </div>
+          </div>
         </div>
 
         <!-- laplace 3D spectrum -->
@@ -42,6 +51,11 @@
             alt="laplace Spectrum Image"
             class="w-full h-auto"
           />
+          <div class="mt-2">
+            <div class="ml-5 flex flex-row gap-2">
+              - The visualize of NFFT spectrum in 3D plot
+            </div>
+          </div>
         </div>
 
         <!-- NFFT Spectrum Image image -->
@@ -59,6 +73,21 @@
             alt="NFFT Spectrum Image"
             class="w-full h-auto"
           />
+
+          <div class="mt-2">
+            <div class="ml-5 flex flex-row gap-2">
+              - A prominent peak frequency in the NFFT spectrum is
+              <div class="text-bold text-red">
+                {{ selectedData?.frequency_nfft_r || 'N/A' }}
+              </div>
+              Hz
+              <div>and</div>
+              <div class="text-bold text-blue">
+                {{ selectedData?.frequency_nfft_b || 'N/A' }}
+              </div>
+              Hz
+            </div>
+          </div>
         </div>
 
         <!-- lsp spectrum image -->
@@ -76,6 +105,109 @@
             alt="LSP Spectrum Image"
             class="w-full h-auto"
           />
+          <div class="ml-5 flex flex-row gap-2">
+            - A prominent peak frequency in the Lomb-Scargle Periodograms
+            spectrum is
+            <div class="text-bold text-red">
+              {{ selectedData?.frequency_lsp_r || 'N/A' }}
+            </div>
+            Hz
+            <div>and</div>
+            <div class="text-bold text-blue">
+              {{ selectedData?.frequency_lsp_b || 'N/A' }}
+            </div>
+            Hz
+          </div>
+        </div>
+      </div>
+      <div class="p-2 border border-[5px]">
+        <div>
+          - Cycle length of NFFT for Entire Samples
+          <div class="flex flex-row gap-2">
+            <div class="text-bold text-red">
+              {{
+                selectedData?.frequency_nfft_r &&
+                selectedData?.frequency_nfft_r !== 0
+                  ? (
+                      selectedData?.range /
+                      selectedData?.frequency_nfft_r /
+                      365
+                    ).toFixed(2)
+                  : 'N/A'
+              }}
+            </div>
+            <div>with</div>
+            <div class="text-bold text-red">
+              {{ (selectedData?.range / 365).toFixed(2) }}
+            </div>
+            <div>years</div>
+          </div>
+        </div>
+        <div>
+          - Cycle length of NFFT for Last 8 years
+          <div class="flex flex-row gap-2">
+            <div class="text-bold text-blue">
+              {{
+                selectedData?.frequency_nfft_b &&
+                selectedData?.frequency_nfft_b !== 0
+                  ? (
+                      selectedData?.range_h /
+                      selectedData?.frequency_nfft_b /
+                      365
+                    ).toFixed(2)
+                  : 'N/A'
+              }}
+            </div>
+            <div>with</div>
+            <div class="text-bold text-blue">
+              {{ (selectedData?.range_h / 365).toFixed(2) }}
+            </div>
+            <div>years</div>
+          </div>
+        </div>
+        <div>
+          - Cycle length of LSP for Entire samples
+          <div class="flex flex-row gap-2">
+            <div class="text-bold text-red">
+              {{
+                selectedData?.frequency_lsp_r &&
+                selectedData?.frequency_lsp_r !== 0
+                  ? (
+                      selectedData?.range /
+                      selectedData?.frequency_lsp_r /
+                      365
+                    ).toFixed(2)
+                  : 'N/A'
+              }}
+            </div>
+            <div>with</div>
+            <div class="text-bold text-red">
+              {{ (selectedData?.range / 365).toFixed(2) }}
+            </div>
+            <div>years</div>
+          </div>
+        </div>
+        <div>
+          - Cycle length of LSP for Last 8 years
+          <div class="flex flex-row gap-2">
+            <div class="text-bold text-blue">
+              {{
+                selectedData?.frequency_lsp_b &&
+                selectedData?.frequency_lsp_b !== 0
+                  ? (
+                      selectedData?.range_h /
+                      selectedData?.frequency_lsp_b /
+                      365
+                    ).toFixed(2)
+                  : 'N/A'
+              }}
+            </div>
+            <div>with</div>
+            <div class="text-bold text-blue">
+              {{ (selectedData?.range_h / 365).toFixed(2) }}
+            </div>
+            <div>years</div>
+          </div>
         </div>
       </div>
     </q-card>
@@ -86,8 +218,11 @@
 import { defineProps, ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useQuasar } from 'quasar';
+import dataset from './data';
 
 const q = useQuasar();
+
+const d = dataset;
 
 const props = defineProps({
   selectedFault: {
@@ -96,10 +231,16 @@ const props = defineProps({
   },
 });
 
+console.log(props.selectedFault);
+
 const timeSeriesImageSrc = ref('');
 const nfftImageSrc = ref('');
 const ltImageSrc = ref('');
 const lsImageSrc = ref('');
+
+const selectedData = d.find(
+  (faultData) => faultData.fName === props.selectedFault.fName
+);
 
 const preloadedImages = {
   timeSeries: `time/${props.selectedFault.id}.png`,
