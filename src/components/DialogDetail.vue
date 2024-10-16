@@ -121,92 +121,135 @@
         </div>
       </div>
       <div class="p-2 border border-[5px]">
-        <div>
-          - Cycle length of NFFT for Entire Samples
-          <div class="flex flex-row gap-2">
-            <div class="text-bold text-red">
-              {{
-                selectedData?.frequency_nfft_r &&
-                selectedData?.frequency_nfft_r !== 0
-                  ? (
-                      selectedData?.range /
-                      selectedData?.frequency_nfft_r /
-                      365
-                    ).toFixed(2)
-                  : 'N/A'
-              }}
-            </div>
-            <div>with</div>
-            <div class="text-bold text-red">
-              {{ (selectedData?.range / 365).toFixed(2) }}
-            </div>
-            <div>years</div>
+        <div class="flex flex-row gap-1">
+          - NFFT for Entire Samples at
+          <div class="text-bold text-red">
+            {{
+              selectedData?.frequency_nfft_r &&
+              selectedData?.frequency_nfft_r !== 0
+                ? (selectedData?.frequency_nfft_r).toFixed(2)
+                : 'N/A'
+            }}
+            cycles
+          </div>
+          <div>per</div>
+          <div class="text-bold text-red">
+            {{ (selectedData?.range / 365).toFixed(2) }} years
           </div>
         </div>
-        <div>
-          - Cycle length of NFFT for Last 8 years
-          <div class="flex flex-row gap-2">
-            <div class="text-bold text-blue">
-              {{
-                selectedData?.frequency_nfft_b &&
-                selectedData?.frequency_nfft_b !== 0
-                  ? (
-                      selectedData?.range_h /
-                      selectedData?.frequency_nfft_b /
-                      365
-                    ).toFixed(2)
-                  : 'N/A'
-              }}
-            </div>
-            <div>with</div>
-            <div class="text-bold text-blue">
-              {{ (selectedData?.range_h / 365).toFixed(2) }}
-            </div>
-            <div>years</div>
+        <div class="flex flex-row gap-1">
+          <div>So, the cycle length is</div>
+          <div class="text-bold text-red">
+            {{
+              selectedData?.frequency_nfft_r &&
+              selectedData?.frequency_nfft_r !== 0
+                ? (
+                    selectedData?.range /
+                    selectedData?.frequency_nfft_r /
+                    365
+                  ).toFixed(2)
+                : 'N/A'
+            }}
+            years
           </div>
         </div>
-        <div>
-          - Cycle length of LSP for Entire samples
-          <div class="flex flex-row gap-2">
-            <div class="text-bold text-red">
-              {{
-                selectedData?.frequency_lsp_r &&
-                selectedData?.frequency_lsp_r !== 0
-                  ? (
-                      selectedData?.range /
-                      selectedData?.frequency_lsp_r /
-                      365
-                    ).toFixed(2)
-                  : 'N/A'
-              }}
-            </div>
-            <div>with</div>
-            <div class="text-bold text-red">
-              {{ (selectedData?.range / 365).toFixed(2) }}
-            </div>
-            <div>years</div>
+
+        <div class="flex flex-row gap-1">
+          - NFFT for Last 8 years at
+          <div class="text-bold text-blue">
+            {{
+              selectedData?.frequency_nfft_b &&
+              selectedData?.frequency_nfft_b !== 0
+                ? (selectedData?.frequency_nfft_b).toFixed(2)
+                : 'N/A'
+            }}
+            cycles
+          </div>
+          <div>per</div>
+          <div class="text-bold text-blue">
+            {{ (selectedData?.range_h / 365).toFixed(2) }} years
           </div>
         </div>
-        <div>
-          - Cycle length of LSP for Last 8 years
-          <div class="flex flex-row gap-2">
-            <div class="text-bold text-blue">
-              {{
-                selectedData?.frequency_lsp_b &&
-                selectedData?.frequency_lsp_b !== 0
-                  ? (
-                      selectedData?.range_h /
-                      selectedData?.frequency_lsp_b /
-                      365
-                    ).toFixed(2)
-                  : 'N/A'
-              }}
-            </div>
-            <div>with</div>
-            <div class="text-bold text-blue">
-              {{ (selectedData?.range_h / 365).toFixed(2) }}
-            </div>
-            <div>years</div>
+        <div class="flex flex-row gap-1">
+          <div>So, the cycle length is</div>
+          <div class="text-bold text-blue">
+            {{
+              selectedData?.frequency_nfft_b &&
+              selectedData?.frequency_nfft_b !== 0
+                ? (
+                    selectedData?.range_h /
+                    selectedData?.frequency_nfft_b /
+                    365
+                  ).toFixed(2)
+                : 'N/A'
+            }}
+            years
+          </div>
+        </div>
+
+        <div class="flex flex-row gap-1">
+          - LSP for Entire samples at
+          <div class="text-bold text-red">
+            {{
+              selectedData?.frequency_lsp_r &&
+              selectedData?.frequency_lsp_r !== 0
+                ? (selectedData?.frequency_lsp_r).toFixed(2)
+                : 'N/A'
+            }}
+            cycles
+          </div>
+          <div>per</div>
+          <div class="text-bold text-red">
+            {{ (selectedData?.range / 365).toFixed(2) }} years
+          </div>
+        </div>
+        <div class="flex flex-row gap-1">
+          <div>So, the cycle length is</div>
+          <div class="text-bold text-red">
+            {{
+              selectedData?.frequency_lsp_r &&
+              selectedData?.frequency_lsp_r !== 0
+                ? (
+                    selectedData?.range /
+                    selectedData?.frequency_lsp_r /
+                    365
+                  ).toFixed(2)
+                : 'N/A'
+            }}
+            years
+          </div>
+        </div>
+
+        <div class="flex flex-row gap-1">
+          - LSP for Last 8 years at
+          <div class="text-bold text-blue">
+            {{
+              selectedData?.frequency_lsp_b &&
+              selectedData?.frequency_lsp_b !== 0
+                ? (selectedData?.frequency_lsp_b).toFixed(2)
+                : 'N/A'
+            }}
+            cycles
+          </div>
+          <div>per</div>
+          <div class="text-bold text-blue">
+            {{ (selectedData?.range_h / 365).toFixed(2) }} years
+          </div>
+        </div>
+        <div class="flex flex-row gap-1">
+          <div>So, the cycle length is</div>
+          <div class="text-bold text-blue">
+            {{
+              selectedData?.frequency_lsp_b &&
+              selectedData?.frequency_lsp_b !== 0
+                ? (
+                    selectedData?.range_h /
+                    selectedData?.frequency_lsp_b /
+                    365
+                  ).toFixed(2)
+                : 'N/A'
+            }}
+            years
           </div>
         </div>
       </div>

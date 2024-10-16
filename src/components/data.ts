@@ -39,7 +39,7 @@ const dataset: information[] = [
     range: 4628,
     range_h: 2842,
     frequency_lt: 7,
-    frequency_nfft_r: 4,
+    frequency_nfft_r: 7,
     frequency_nfft_b: 4,
     frequency_lsp_r: 6.6,
     frequency_lsp_b: 5.2,
