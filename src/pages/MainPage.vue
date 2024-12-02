@@ -1,77 +1,194 @@
 <template>
   <div>
-    <div id="mapDiv" class="absolute p-0 m-0 h-screen w-full m-auto"></div>
-    <div class="relative z-1 p-5">
-      <!-- <label for="faultLine">Select Fault Line:</label> -->
-      <div disabled class="text-bold text-[14px] text-black">
-        Select Fault Lines
-      </div>
-      <select
-        class="rounded-lg h-auto w-auto p-2 border border-2 cursor-pointer"
-        v-model="selectedFaultLine.fName"
+    <!-- Map Div -->
+    <div
+      id="mapDiv"
+      :class="[
+        'absolute p-0 m-0',
+        isMobile ? (tabOpen ? 'h-1/2 w-full' : 'h-full w-full') : 'h-full',
+        tabOpen && !isMobile ? 'w-1/2 right-0' : 'w-full',
+      ]"
+    ></div>
+
+    <!-- Search Box -->
+    <div
+      :class="[
+        'absolute p-4',
+        isMobile ? 'top-4 left-4 w-fit' : 'top-4 left-4 w-fit',
+      ]"
+    >
+      <UseSelect
+        class=""
+        v-model="selectedFaultLine"
         @change="selectFaultLine"
         placeholder="Select Fault Lines"
+        :options="faultLines"
+        optionLabel="fName"
       >
-        <option disabled class="text-bold text-[14px] text-black">
-          Select Fault Line
-        </option>
-        <option
-          v-for="faultLine in faultLines"
-          :value="faultLine.fName"
-          :key="faultLine.fName"
-        >
-          {{ faultLine.fName }}
-        </option>
-      </select>
+      </UseSelect>
     </div>
-    <div class="relative z-1 pl-5">
-      <button
-        v-if="selectedFaultLine.id !== 0"
-        @click="toggleDialog"
-        class="h-auto w-auto bg-white p-2 rounded-lg hover:bg-black text-black hover:text-white transition-colors duration-300"
-      >
-        {{ isDialogOpen ? 'Close Dialog' : 'Open Dialog' }}
-      </button>
-    </div>
+
+    <!-- Tab Panel -->
     <div
-      class="absolute bottom-7 right-4 z-10 text-white bg-black p-1 rounded-md"
+      :class="[
+        'fixed bg-white shadow-lg rounded-2xl transition-transform duration-300 overflow-y-auto',
+        isMobile ? 'w-full left-0 bottom-0 h-1/2' : 'w-1/2 left-0 top-0 h-full',
+        tabOpen
+          ? 'translate-y-0 translate-x-0'
+          : isMobile
+          ? 'translate-y-full'
+          : '-translate-x-full',
+      ]"
     >
-      <p>
-        {{
-          'LON ' +
-          selectedCoordinates.longitude +
-          ' LAT ' +
-          selectedCoordinates.latitude
-        }}
-      </p>
+      <button
+        @click="toggleTab"
+        class="absolute right-4 top-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ease-in-out"
+        aria-label="Close"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+      <div class="p-4">
+        <div v-if="!isMobile">
+          <UseSelect
+            class=""
+            v-model="selectedFaultLine"
+            @change="selectFaultLine"
+            placeholder="Select Fault Lines"
+            :options="faultLines"
+            optionLabel="fName"
+          >
+          </UseSelect>
+        </div>
+        <DialogDetail
+          v-if="selectedFaultLine.id !== 0"
+          :key="selectedFaultLine.id"
+          :selectedFault="selectedFaultLine"
+        />
+      </div>
     </div>
-  </div>
 
-  <!-- <q-dialog v-model="isDialogOpen">
-    <dialogDetail :selectedFault="selectedFaultLine" />
-  </q-dialog> -->
-
-  <div class="flex justify-center items-center h-screen">
-    <q-dialog
-      v-model="isDialogOpen"
-      class="w-full sm:w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4"
+    <!-- Tab Toggle Button -->
+    <button
+      v-if="!tabOpen && selectedFaultLine.id !== 0"
+      @click="toggleTab"
+      :class="[
+        'fixed bg-white text-black py-2 px-4 rounded-lg border border-gray-300 shadow-lg ',
+        isMobile
+          ? 'bottom-10 left-1/2 transform -translate-x-1/2'
+          : 'top-20 left-8',
+      ]"
     >
-      <dialogDetail :selectedFault="selectedFaultLine" />
-    </q-dialog>
+      Open Tab
+    </button>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { loadModules } from 'esri-loader';
 import polygonData from 'src/utils/polygon-normal.json';
-import dialogDetail from 'src/components/DialogDetail.vue';
+import DialogDetail from 'src/components/DialogDetail.vue';
 
+const selectedCoordinates = ref({ longitude: 0, latitude: 0 });
 let map = null;
 let mapView = null;
-const selectedCoordinates = ref({ longitude: 0, latitude: 0 });
-const selectedFaultLine = ref({ id: 0, fName: 'NOT SELECTED' });
-const isDialogOpen = ref(false);
+
+const tabOpen = ref(false);
+
+const isMobile = computed(() => window.innerWidth <= 768);
+
+const toggleTab = () => {
+  tabOpen.value = !tabOpen.value;
+};
+
+window.addEventListener('resize', () => {
+  if (tabOpen.value && !isMobile.value) {
+    tabOpen.value = false;
+  }
+});
+
+// Initialize the map
+onMounted(async () => {
+  const [esriConfig, Map, MapView, FeatureLayer, GraphicsLayer] =
+    await loadModules([
+      'esri/config',
+      'esri/Map',
+      'esri/views/MapView',
+      'esri/layers/FeatureLayer',
+      'esri/layers/GraphicsLayer',
+    ]);
+
+  esriConfig.request.maxUrlLength = 2000;
+
+  esriConfig.apiKey =
+    'AAPK271827ddb21f45dabb09474524128651cM5NQDQmkAxMGWdNQswNqk6sY_EiH-QKkpcfV4PR4sHf_g1By15TQHbegx0jWEiG';
+
+  map = new Map({ basemap: 'arcgis/topographic' });
+
+  mapView = new MapView({
+    container: 'mapDiv',
+    map: map,
+    zoom: 6,
+    center: [100.9925, 13.7563],
+  });
+
+  const graphicsLayer = new GraphicsLayer();
+  map.add(graphicsLayer);
+
+  const polygonLayer = new GraphicsLayer({ id: 'polygonLayer' });
+  map.add(polygonLayer);
+
+  const pointLayer = new GraphicsLayer({ id: 'pointLayer' });
+  map.add(pointLayer);
+
+  const ThaifaultLines = new FeatureLayer({
+    url: 'https://gisportal.dmr.go.th/arcgis/rest/services/HAZARD/ZONE_ACTIVEFAULT/MapServer',
+  });
+
+  const bordeLines = new FeatureLayer({
+    url: 'https://services9.arcgis.com/CGSTChWyOjfHFaYa/arcgis/rest/services/Fault_Map__Everyone__WFL1/FeatureServer/3',
+  });
+
+  // const FaultLines = new FeatureLayer({
+  //   url: 'https://services.arcgis.com/jIL9msH9OI208GCb/arcgis/rest/services/Active_Faults/FeatureServer',
+  // });
+
+  map.addMany([ThaifaultLines, bordeLines]);
+
+  const navigationDiv = document.querySelector('.esri-ui-top-left');
+  if (navigationDiv) {
+    navigationDiv.classList.remove('esri-ui-top-left');
+    navigationDiv.classList.add('esri-ui-bottom-left');
+  }
+
+  mapView.container.addEventListener('mousemove', (event) => {
+    const screenPoint = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+    const mapPoint = mapView.toMap(screenPoint);
+    selectedCoordinates.value = {
+      longitude: mapPoint.longitude.toFixed(4),
+      latitude: mapPoint.latitude.toFixed(4),
+    };
+  });
+});
+
+// const selectedFaultLine = ref({ id: 0, fName: 'NOT SELECTED' });
+const selectedFaultLine = ref('NOT SELECTED');
 const faultLines = [
   {
     id: 0,
@@ -177,86 +294,29 @@ const faultLines = [
   },
 ];
 
-onMounted(async () => {
-  const [esriConfig, Map, MapView, FeatureLayer, GraphicsLayer] =
-    await loadModules([
-      'esri/config',
-      'esri/Map',
-      'esri/views/MapView',
-      'esri/layers/FeatureLayer',
-      'esri/layers/GraphicsLayer',
-    ]);
-
-  esriConfig.request.maxUrlLength = 2000;
-
-  esriConfig.apiKey =
-    'AAPK271827ddb21f45dabb09474524128651cM5NQDQmkAxMGWdNQswNqk6sY_EiH-QKkpcfV4PR4sHf_g1By15TQHbegx0jWEiG';
-
-  map = new Map({ basemap: 'arcgis/topographic' });
-
-  mapView = new MapView({
-    container: 'mapDiv',
-    map: map,
-    zoom: 6,
-    center: [100.9925, 13.7563],
-  });
-
-  const graphicsLayer = new GraphicsLayer();
-  map.add(graphicsLayer);
-
-  const polygonLayer = new GraphicsLayer({ id: 'polygonLayer' });
-  map.add(polygonLayer);
-
-  const pointLayer = new GraphicsLayer({ id: 'pointLayer' });
-  map.add(pointLayer);
-
-  const ThaifaultLines = new FeatureLayer({
-    url: 'https://gisportal.dmr.go.th/arcgis/rest/services/HAZARD/ZONE_ACTIVEFAULT/MapServer',
-  });
-
-  const bordeLines = new FeatureLayer({
-    url: 'https://services9.arcgis.com/CGSTChWyOjfHFaYa/arcgis/rest/services/Fault_Map__Everyone__WFL1/FeatureServer/3',
-  });
-
-  // const FaultLines = new FeatureLayer({
-  //   url: 'https://services.arcgis.com/jIL9msH9OI208GCb/arcgis/rest/services/Active_Faults/FeatureServer',
-  // });
-
-  map.addMany([ThaifaultLines, bordeLines]);
-
-  const navigationDiv = document.querySelector('.esri-ui-top-left');
-  if (navigationDiv) {
-    navigationDiv.classList.remove('esri-ui-top-left');
-    navigationDiv.classList.add('esri-ui-bottom-left');
-  }
-
-  mapView.container.addEventListener('mousemove', (event) => {
-    const screenPoint = {
-      x: event.clientX,
-      y: event.clientY,
-    };
-    const mapPoint = mapView.toMap(screenPoint);
-    selectedCoordinates.value = {
-      longitude: mapPoint.longitude.toFixed(4),
-      latitude: mapPoint.latitude.toFixed(4),
-    };
-  });
+const getSelectedFault = computed(() => {
+  return faultLines.find(
+    (fault) => fault.fName === selectedFaultLine.value.fName
+  );
 });
 
 const selectFaultLine = async () => {
   const [Graphic] = await loadModules(['esri/Graphic']);
-  const selectedFault = faultLines.find(
-    (faultLine) => faultLine.fName === selectedFaultLine.value.fName
-  );
+  // const selectedFault = faultLines.find(
+  //   (faultLine) => faultLine.fName === selectedFaultLine.value.fName
+  // );
 
-  selectedFaultLine.value.id = selectedFault.id;
-  selectedFaultLine.value.fName = selectedFault.fName;
+  // const updatedSelectedFaultLine = {
+  //   id: selectedFault.id,
+  //   fName: selectedFault.fName,
+  //   coordinates: selectedFault.coordinates,
+  // };
 
-  // console.log(selectedFaultLine.value);
+  // selectedFaultLine.value = updatedSelectedFaultLine;
+
+  const selectedFault = getSelectedFault.value;
 
   if (selectedFault && selectedFault.fName !== 'NOT SELECTED') {
-    selectedFaultLine.value.id = selectedFault.id;
-    selectedFaultLine.value.fName = selectedFault.fName;
     map.findLayerById('polygonLayer').removeAll();
     map.findLayerById('pointLayer').removeAll();
 
@@ -333,7 +393,7 @@ const selectFaultLine = async () => {
       map.findLayerById('polygonLayer').add(polygonGraphic);
     }
 
-    isDialogOpen.value = true;
+    tabOpen.value = true;
   } else {
     map.findLayerById('polygonLayer').removeAll();
     map.findLayerById('pointLayer').removeAll();
@@ -341,11 +401,7 @@ const selectFaultLine = async () => {
     mapView.center = [100.9925, 13.7563];
     mapView.zoom = 6;
 
-    isDialogOpen.value = false;
+    tabOpen.value = false;
   }
-};
-
-const toggleDialog = () => {
-  isDialogOpen.value = !isDialogOpen.value;
 };
 </script>
