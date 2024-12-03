@@ -108,13 +108,7 @@
     </div>
 
     <!-- Detailed Frequency Calculations -->
-    <div
-      class="mt-8 p-6 border-2 border-gray-300 rounded-lg shadow-lg"
-      :class="{
-        'bg-gray-100': isAnalysisDisabled,
-        'opacity-50 cursor-not-allowed': isAnalysisDisabled,
-      }"
-    >
+    <div class="mt-8 p-6 border-2 border-gray-300 rounded-lg shadow-lg">
       <div class="text-lg font-medium text-gray-800 mb-4">Analysis Part</div>
 
       <div
