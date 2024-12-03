@@ -2,7 +2,7 @@
   "name": "earthquake-map",
   "version": "0.0.1",
   "description": "This is the project for frontend of webapplication in earthquake research",
-  "productName": "Quasar App",
+  "productName": "Earthquake-Estimation",
   "author": "BIGGY00 <bowbigzaza2014@gmail.com>",
   "private": true,
   "scripts": {
