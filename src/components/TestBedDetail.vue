@@ -9,43 +9,67 @@
     </div>
 
     <!-- Flex direction switches based on screen size and grid for larger screens -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-8">
       <!-- Time-series data image 1 -->
-      <div class="bg-white shadow-lg rounded-lg p-5">
+      <div class="bg-white shadow-lg rounded-lg p-5 h-auto">
         <div class="text-xl font-medium text-gray-800 mb-3">
           - Linear Regression Model
         </div>
-        <UseImage
+        <!-- <UseImage
           v-if="LRImageSrc"
           :src="LRImageSrc"
-          alt="Image"
+          alt="LR Model"
           preview
           class="w-full h-auto rounded-lg mb-3"
-        />
+        /> -->
+        <UseImageCompare class="w-full h-fulll">
+          <template #left>
+            <img :src="LRImageSrc" />
+          </template>
+          <template #right>
+            <img :src="LRImageSrcSecond" />
+          </template>
+        </UseImageCompare>
       </div>
 
       <!-- Laplace 3D Spectrum -->
       <div class="bg-white shadow-lg rounded-lg p-5">
         <div class="text-xl font-medium text-gray-800 mb-3">- KNN Model</div>
-        <UseImage
+        <!-- <UseImage
           v-if="KNNImageSrc"
           :src="KNNImageSrc"
-          alt="Image"
+          alt="KNN Model"
           preview
           class="w-full h-auto rounded-lg mb-3"
-        />
+        /> -->
+        <UseImageCompare class="w-full h-fulll">
+          <template #left>
+            <img :src="KNNImageSrc" />
+          </template>
+          <template #right>
+            <img :src="KNNImageSrcSecond" />
+          </template>
+        </UseImageCompare>
       </div>
 
       <!-- NFFT Spectrum Image -->
       <div class="bg-white shadow-lg rounded-lg p-5">
         <div class="text-xl font-medium text-gray-800 mb-3">- SVM Model</div>
-        <UseImage
+        <!-- <UseImage
           v-if="SVMImageSrc"
           :src="SVMImageSrc"
-          alt="Image"
+          alt="SVM Model"
           preview
           class="w-full h-auto rounded-lg mb-3"
-        />
+        /> -->
+        <UseImageCompare class="w-full h-fulll">
+          <template #left>
+            <img :src="SVMImageSrc" />
+          </template>
+          <template #right>
+            <img :src="SVMImageSrcSecond" />
+          </template>
+        </UseImageCompare>
       </div>
 
       <!-- Lomb-Scargle Periodograms Spectrum -->
@@ -53,13 +77,21 @@
         <div class="text-xl font-medium text-gray-800 mb-3">
           - Random Forest
         </div>
-        <UseImage
+        <!-- <UseImage
           v-if="RFImageSrc"
           :src="RFImageSrc"
-          alt="Image"
+          alt="RF Model"
           preview
           class="w-full h-auto rounded-lg mb-3"
-        />
+        /> -->
+        <UseImageCompare class="w-full h-fulll">
+          <template #left>
+            <img :src="RFImageSrc" />
+          </template>
+          <template #right>
+            <img :src="RFImageSrcSecond" />
+          </template>
+        </UseImageCompare>
       </div>
     </div>
   </div>
@@ -68,11 +100,8 @@
 <script setup>
 import { defineProps, ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
-// import dataset from './data';
 
 const q = useQuasar();
-
-// const d = dataset;
 
 const props = defineProps({
   selectedFault: {
@@ -86,15 +115,22 @@ const KNNImageSrc = ref('');
 const SVMImageSrc = ref('');
 const RFImageSrc = ref('');
 
-// const selectedData = d.find(
-//   (faultData) => faultData.fName === props.selectedFault.fName
-// );
+const LRImageSrcSecond = ref('');
+const KNNImageSrcSecond = ref('');
+const SVMImageSrcSecond = ref('');
+const RFImageSrcSecond = ref('');
 
+// Set the initial image sources based on the selected fault line
 const preloadedImages = {
   LR: `lr/${props.selectedFault.id}.png`,
   KNN: `knn/${props.selectedFault.id}.png`,
   SVM: `svm/${props.selectedFault.id}.png`,
   RF: `rf/${props.selectedFault.id}.png`,
+
+  LRSecond: `lr_second/${props.selectedFault.id}.png`,
+  KNNSecond: `knn_second/${props.selectedFault.id}.png`,
+  SVMSecond: `svm_second/${props.selectedFault.id}.png`,
+  RFSecond: `rf_second/${props.selectedFault.id}.png`,
 };
 
 onMounted(async () => {
@@ -106,6 +142,11 @@ onMounted(async () => {
     KNNImageSrc.value = preloadedImages.KNN;
     SVMImageSrc.value = preloadedImages.SVM;
     RFImageSrc.value = preloadedImages.RF;
+
+    LRImageSrcSecond.value = preloadedImages.LRSecond;
+    KNNImageSrcSecond.value = preloadedImages.KNNSecond;
+    SVMImageSrcSecond.value = preloadedImages.SVMSecond;
+    RFImageSrcSecond.value = preloadedImages.RFSecond;
   } catch (error) {
     console.log(error);
   } finally {

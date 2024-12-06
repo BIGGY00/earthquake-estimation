@@ -4,22 +4,26 @@
     <div
       id="mapDiv"
       :class="[
-        'absolute p-0 m-0',
+        'absolute p-0 m-0 touch-none', // Ensure touch gestures are captured properly
         isMobile
           ? tabOpen || tabOpenTestbed
             ? tabOpen
-              ? 'h-1/2 w-full top-0' // Mobile: `tabOpen` comes from bottom with half height
-              : 'h-1/2 w-full bottom-0' // Mobile: `tabOpenTestbed` comes from top with half height
+              ? 'w-full top-0' // Mobile: tabOpen comes from bottom
+              : 'w-full bottom-0' // Mobile: tabOpenTestbed comes from top
             : 'h-full w-full' // Mobile: Full height and width when no tab is open
           : tabOpen
-          ? 'h-full w-1/2 right-0' // Desktop: `tabOpen` is open, position map on the right
+          ? 'h-full w-1/2 right-0' // Desktop: tabOpen is open, position map on the right
           : tabOpenTestbed
-          ? 'h-full w-1/2 left-0' // Desktop: `tabOpenTestbed` is open, position map on the left
+          ? 'h-full w-1/2 left-0' // Desktop: tabOpenTestbed is open, position map on the left
           : 'h-full w-full', // Desktop: Full height and width when no tab is open
       ]"
+      :style="{
+        height:
+          isMobile && (tabOpen || tabOpenTestbed) ? 'calc(100% - 50%)' : '100%',
+      }"
     ></div>
 
-    <!-- Search Box -->
+    <!-- Normal Select Box -->
     <div
       :class="[
         'absolute p-4',
@@ -34,7 +38,7 @@
           @change="selectFaultLine"
           placeholder="Select Fault Lines"
         >
-          <option disabled value="" class="text-sm text-gray-500">
+          <option disabled value="NOT SELECTED" class="text-sm text-gray-500">
             Select Fault Line
           </option>
           <option
@@ -48,7 +52,7 @@
       </div>
     </div>
 
-    <!-- Search Box Testbed -->
+    <!-- Testbed Select Box -->
     <div
       :class="[
         'absolute p-4',
@@ -56,14 +60,14 @@
       ]"
     >
       <div class="grid grid-rows">
-        <div class="text-bold">Testbed</div>
+        <div class="text-bold">Testbed for ML</div>
         <select
           class="w-fit p-3 pl-4 pr-10 rounded-lg border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out"
           v-model="selectedFaultLineTestbed.fName"
           @change="selectFaultLineTestbed"
           placeholder="Select Fault Lines"
         >
-          <option disabled value="" class="text-sm text-gray-500">
+          <option disabled value="NOT SELECTED" class="text-sm text-gray-500">
             Select Fault Line
           </option>
           <option
@@ -473,7 +477,19 @@ const faultLinesTestbed = [
   },
 ];
 
+const resetSelectBoxes = (activeSelect) => {
+  if (activeSelect === 'normal') {
+    selectedFaultLineTestbed.value = { fName: 'NOT SELECTED' };
+    tabOpenTestbed.value = false;
+  } else if (activeSelect === 'testbed') {
+    selectedFaultLine.value = { fName: 'NOT SELECTED' };
+    tabOpen.value = false;
+  }
+};
+
 const selectFaultLine = async () => {
+  resetSelectBoxes('normal');
+
   const [Graphic] = await loadModules(['esri/Graphic']);
   const selectedFault = faultLines.find(
     (faultLine) => faultLine.fName === selectedFaultLine.value.fName
@@ -579,6 +595,8 @@ const selectFaultLine = async () => {
 };
 
 const selectFaultLineTestbed = async () => {
+  resetSelectBoxes('testbed');
+
   const [Graphic] = await loadModules(['esri/Graphic']);
 
   const selectedFaultTestbed = faultLinesTestbed.find(

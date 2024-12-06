@@ -4,6 +4,7 @@ import Aura from '@primevue/themes/aura';
 import 'primeicons/primeicons.css';
 import Image from 'primevue/image';
 import Select from 'primevue/select';
+import ImageCompare from 'primevue/imagecompare';
 import { definePreset } from '@primevue/themes';
 
 const MyPreset = definePreset(Aura, {
@@ -38,4 +39,5 @@ export default boot(({ app }) => {
 
   app.component('UseImage', Image);
   app.component('UseSelect', Select);
+  app.component('UseImageCompare', ImageCompare);
 });

@@ -17,6 +17,7 @@
     "@primevue/themes": "^4.2.4",
     "@quasar/extras": "^1.16.14",
     "axios": "^1.7.8",
+    "chart.js": "^4.4.7",
     "esri-loader": "^3.7.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.4",
